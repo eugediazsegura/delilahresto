@@ -25,11 +25,11 @@ router.post('/',(req,res)=>{
             //const element = object[key];  
         }
     } 
-res.send(`Error  errors.length = 1 ? ` )
-
+    
     if (errors.length > 0) {
+        res.send(`Error: Los siguientes campos son requeridos: ${errors.join(', ')}` )
         
-        res.send(`Error - Campos Faltantes:`)
+        
     }
     //if(!body.username){res.send('Falta campo username');}
     //if(!body.password){res.send('Falta campo password');}
