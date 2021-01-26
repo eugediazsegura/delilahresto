@@ -41,7 +41,8 @@ router.post('/',(req,res)=>{
         `;
         const [resultados] = await db.query(querySQL, {raw:true});
         if(resultados){
-            res.send(req.body);
+            res.status(201)
+            res.send(`Creted : ${req.body}`);
         }else{
             res.send(resultados);
         }
@@ -57,7 +58,8 @@ router.get('/:id',(req,res)=>{
                 res.status(404)
                 res.send("Not Found : The user doesn't exist.")
             }
-        res.send(resultado);
+        res.status(200)
+        res.send(` OK: ${resultado}`);
         });
 })
 
@@ -89,7 +91,7 @@ router.put('/:id',(req,res)=>{
 
         const [resultado] = await db.query(querySQL, {raw:true});
         console.log(resultado)
-        res.send(resultado)  
+        res.send(` OK Modified: ${req.body}`)  
 
     })  
 })
@@ -99,7 +101,7 @@ router.delete('/:id',(req,res)=>{
         const id = req.params.id
         const querySQL = ` DELETE FROM users WHERE id =${id}`;
         const [resultado] = await db.query(querySQL, {raw:true});
-        res.send(resultado);
+        res.send(` Delete user permanently: ${req.body}`);
         });
 })
 
