@@ -2,10 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const router =  express.Router();
 const db = require('../sql/conectionDB');
-
+const validarToken = require('../middlewares');
+const validateToken = require('../middlewares');
 router.use(bodyParser.json());
+router.use(validateToken)
 
-router.get('/',(req, res)=>{
+router.get('/', (req, res)=>{
     db.authenticate().then(async ()=>{
     const querySQL = ` SELECT * FROM users`;
     const [resultados] = await db.query(querySQL, {raw:true});
@@ -42,10 +44,12 @@ router.post('/',(req,res)=>{
         const [resultados] = await db.query(querySQL, {raw:true});
         if(resultados){
             res.status(201)
-            res.send(`Creted : ${req.body}`);
+            res.send({status: 'Created', user: req.body});
         }else{
             res.send(resultados);
         }
+    }).catch(e=>{
+        res.status(500).send(e.parent.sqlMessage)
     })
 });
 
@@ -59,7 +63,7 @@ router.get('/:id',(req,res)=>{
                 res.send("Not Found : The user doesn't exist.")
             }
         res.status(200)
-        res.send(` OK: ${resultado}`);
+        res.json({ OK: resultado});
         });
 })
 

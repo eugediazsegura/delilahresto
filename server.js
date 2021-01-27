@@ -8,6 +8,9 @@ require('./src/sql/conectionDB').createTables();
 const usersRouter = require('./src/routes/users');
 app.use('/users', usersRouter);
 
+/* const productsRouter= require('./src/routes/products');
+app.use('/products', productsRouter); */
+
 const loginRouter= require('./src/routes/login');
 app.use('/login', loginRouter);
 

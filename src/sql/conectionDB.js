@@ -17,7 +17,15 @@ async function createTables(){
       DEFAULT CHARSET=utf8mb4 
       COLLATE=utf8mb4_0900_ai_ci
     `);
-    //queries.push('');
+    queries.push(`CREATE TABLE IF NOT EXISTS delilah_resto.products (
+        id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+        product VARCHAR (255) UNIQUE NOT NULL,
+        price DECIMAL (10,2) UNSIGNED NOT NULL,
+        description VARCHAR (255),
+        image VARCHAR(255) UNIQUE NOT NULL
+      )  AUTO_INCREMENT=1 
+      DEFAULT CHARSET=utf8mb4 
+      COLLATE=utf8mb4_0900_ai_ci`);
 
     sequelize.authenticate().then(async ()=>{
         queries.forEach(async query=>{
