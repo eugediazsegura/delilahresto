@@ -6,42 +6,35 @@ const jwt = require('jsonwebtoken');
 
 router.use(bodyParser.json());
 
-async function validarUsuarioContrasena(username, password){
-
-    const usersQuery = ` SELECT username, password FROM users WHERE username = "${username}" AND password = "${password}"`;
-
-    const [resultadoUsuarios] = await db.query(usersQuery, {raw:true});
-    console.log(resultadoUsuarios)
-/*     if(resultadoUsuarios.lenght > 0){
-        return true
+async function validarUsuarioContrasena (username, password) {
+    const validateQuery =  ` SELECT username, password,admin FROM users WHERE username = "${username}" AND password = "${password}"`;
+    console.log({validateq : validateQuery})
+    const [resultadoUsuarios] = await db.query(validateQuery, {raw:true});
+    if(resultadoUsuarios.length > 0){ 
+        return resultadoUsuarios
     }else{
-        return false
-    } */
+        res.json({error: 'No existe el usuario o contraseña'})
+    }   
+} 
 
-    return resultadoUsuarios.length > 0
-
- /*    for (const iterator of Users) {
-        
-    }
-    console.log(resultados[0].username) */
-}
-
- router.post('/',async (req,res)=>{ 
+router.post('/', async (req,res)=>{ 
     let {username, password} = req.body;
     const validado = await validarUsuarioContrasena(username, password);
-    console.log("vali"+ validado)
+    console.log({"vali": validado[0].username})
     if(!validado){
         res.json({error: 'No existe el usuario o contraseña'});
         return;
     }
+    const admin= validado[0].admin;
+
 
     const token = jwt.sign({
-        username
+        username, password, admin,
     }, 'supEr5ecret4JWT');
 
-    res.json({token})
 
+   res.json({token}) 
 });
 
 
-module.exports = router
+module.exports = router;
