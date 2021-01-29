@@ -19,7 +19,7 @@ async function createTables(){
     `);
     queries.push(`CREATE TABLE IF NOT EXISTS delilah_resto.products (
         id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-        product VARCHAR (255) UNIQUE NOT NULL,
+        name VARCHAR (255) UNIQUE NOT NULL,
         price DECIMAL (10,2) UNSIGNED NOT NULL,
         description VARCHAR (255),
         image VARCHAR(255) UNIQUE NOT NULL
