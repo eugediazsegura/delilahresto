@@ -2,39 +2,50 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const router =  express.Router();
 const db = require('../sql/conectionDB');
-const validarToken = require('../middlewares');
-const validateToken = require('../middlewares');
+const {validateToken , validateTokenAdmin} = require('../middlewares');
 router.use(bodyParser.json());
-router.use(validateToken)
 
-router.get('/', (req, res)=>{
+
+router.get('/',validateToken, validateTokenAdmin,  (req, res)=>{
     db.authenticate().then(async ()=>{
     const querySQL = ` SELECT * FROM users`;
     const [resultados] = await db.query(querySQL, {raw:true});
-        if(resultados.length < 1){
-            res.status(404)
-            res.send("Not Found : There are no users")
+    console.log(resultados)
+        if(resultados.length == 0){
+            res.status(202).send("No Content: There are no users");
+            return;
         }
-    res.send(resultados);
+    res.send(resultados); 
     });
 });
 
-router.post('/',(req,res)=>{
-    const body = req.body;
-    const requiredKeys = ["username", "password", "fullname", "email", "address", "phone"];
-    const errors = [];
-    for (const key of requiredKeys) {
-
-        if (!body.hasOwnProperty(key)) {
-            console.log(key)
-            errors.push(key)
-        }
-    } 
+router.post('/', (req,res)=>{
     
+    const body = req.body;
+     const requiredKeys = ["username", "password", "fullname", "email", "address", "phone"];
+     const errors = [];
+     
+     if(Object.keys(body).length == 0){
+        res.status(400)
+        res.send("Bad Request : The body is empty");
+        return;
+
+    }
+
+     for (const key of requiredKeys) {
+ 
+         if (!body.hasOwnProperty(key)) {
+             console.log(key)
+             errors.push(key)
+         }
+     } 
+
     if (errors.length > 0) {
         res.status(400)
-        res.send(`Bad Request - Error: Los siguientes campos son requeridos: ${errors.join(', ')}` )
+        res.send(`Bad Request - The following fields are required or are wrong: ${errors.join(', ')}` )
+        return;
     }
+
 
     db.authenticate().then(async ()=>{
         const querySQL = `
@@ -49,11 +60,11 @@ router.post('/',(req,res)=>{
             res.send(resultados);
         }
     }).catch(e=>{
-        res.status(500).send(e.parent.sqlMessage)
+        res.status(400).send(e.parent.sqlMessage)
     })
 });
 
-router.get('/:id',(req,res)=>{
+router.get('/:id', validateToken, validateTokenAdmin,(req,res)=>{
     db.authenticate().then(async ()=>{
         const id = req.params.id
         const querySQL = ` SELECT * FROM users WHERE id =${id}`;
@@ -61,6 +72,7 @@ router.get('/:id',(req,res)=>{
             if(resultado.length < 1){
                 res.status(404)
                 res.send("Not Found : The user doesn't exist.")
+                return;
             }
         res.status(200)
         res.json({ OK: resultado});
@@ -68,17 +80,41 @@ router.get('/:id',(req,res)=>{
 })
 
 
-router.put('/:id',(req,res)=>{
+router.put('/:id', validateToken, validateTokenAdmin,(req,res)=>{
     const id = req.params.id; 
     const body = req.body;
     const userKeys = ["username", "password", "fullname", "email", "address", "phone"];
     const editKeys = [];
-    for (const key of userKeys) {
+    const errors= {empty:[],wrong:[]};
 
-        if (body.hasOwnProperty(key)) {
+    if(Object.keys(body).length == 0){
+        res.status(400)
+        res.send("Bad Request : The body is empty");
+        return;
+
+    }
+    for (const key in body) {
+        if(userKeys.includes(key) && body[key]){
             editKeys.push({[key] : body[key]})
+        }else if(body[key] == ''){
+            errors.empty.push(key)
+        }else{
+            errors.wrong.push(key)
         }
-    } 
+    }
+
+    if (errors.wrong.length > 0 || errors.empty.length > 0) {
+        let msg = '';
+        if(errors.empty.length>0){
+            msg = msg + `Bad Request - The fields are empty : ${errors.empty.join(', ')}\n`; 
+        }
+        if(errors.wrong.length>0){
+            msg = msg + `Bad Request - The fields are wrong : ${errors.wrong.join(', ')}`;
+        }
+        res.status(400)
+        res.send(msg)
+        return;
+    }
 
       db.authenticate().then(async ()=>{
         let querySQL = `
@@ -94,18 +130,30 @@ router.put('/:id',(req,res)=>{
         querySQL+= ` WHERE id= "${id}"`;
 
         const [resultado] = await db.query(querySQL, {raw:true});
+        if(resultado.changedRows == 0){
+            res.status(404)
+            res.send("Not Found : The user doesn't exist.");
+            return;
+        } 
         console.log(resultado)
-        res.send(` OK Modified: ${req.body}`)  
+        res.send({status: 'Modified', user: req.body})  
 
     })  
 })
 
-router.delete('/:id',(req,res)=>{
+router.delete('/:id', validateToken, validateTokenAdmin,(req,res)=>{
     db.authenticate().then(async ()=>{
         const id = req.params.id
         const querySQL = ` DELETE FROM users WHERE id =${id}`;
         const [resultado] = await db.query(querySQL, {raw:true});
-        res.send(` Delete user permanently: ${req.body}`);
+        console.log(resultado)
+        if(resultado.affectedRows == 0){
+            res.status(404)
+            res.send("Not Found : The user doesn't exist.")
+            return;
+        }
+        res.send({status: 'Deleted', user: id});
+        return;
         });
 })
 
