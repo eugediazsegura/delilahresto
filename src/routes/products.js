@@ -6,26 +6,25 @@ const {validateToken , validateTokenAdmin} = require('../middlewares');
 router.use(bodyParser.json());
 
 
-router.get('/',validateToken, validateTokenAdmin,  (req, res)=>{
+router.get('/', (req, res)=>{
     db.authenticate().then(async ()=>{
-    const querySQL = ` SELECT * FROM users`;
+    const querySQL = ` SELECT * FROM products`;
     const [resultados] = await db.query(querySQL, {raw:true});
     console.log(resultados)
         if(resultados.length == 0){
-            res.status(202).send("No Content: There are no users");
+            res.status(202).send("No Content: There are no products");
             return;
         }
     res.send(resultados); 
     });
 });
 
-router.post('/', (req,res)=>{
+router.post('/', validateToken, validateTokenAdmin, (req,res)=>{
     
     const body = req.body;
-    console.log(body)
-    const requiredKeys = ["username", "password", "fullname", "email", "address", "phone"];
-    const editKeys = [];
-    const errors= {empty:[],wrong:[], required: []};
+     const requiredKeys = ["name", "price", "description", "image"];
+     const editKeys = [];
+     const errors= {empty:[],wrong:[], required: []};
      
      if(Object.keys(body).length == 0){
         res.status(400)
@@ -67,16 +66,15 @@ router.post('/', (req,res)=>{
         return;
     }
 
-
     db.authenticate().then(async ()=>{
         const querySQL = `
-        INSERT INTO users (username, password, fullname, email, address, phone)
-         VALUES('${body.username}', '${body.password}', '${body.fullname}', '${body.email}', '${body.address}', ${body.phone});
+        INSERT INTO products (name, price, description, image)
+         VALUES('${body.name}', ${body.price}, '${body.description}', '${body.image}');
         `;
         const [resultados] = await db.query(querySQL, {raw:true});
         if(resultados){
             res.status(201)
-            res.send({status: 'Created', user: req.body});
+            res.send({status: 'Created', product: req.body});
         }else{
             res.send(resultados);
         }
@@ -88,11 +86,11 @@ router.post('/', (req,res)=>{
 router.get('/:id', validateToken, validateTokenAdmin,(req,res)=>{
     db.authenticate().then(async ()=>{
         const id = req.params.id
-        const querySQL = ` SELECT * FROM users WHERE id =${id}`;
+        const querySQL = ` SELECT * FROM products WHERE id =${id}`;
         const [resultado] = await db.query(querySQL, {raw:true});
             if(resultado.length < 1){
                 res.status(404)
-                res.send("Not Found : The user doesn't exist.")
+                res.send("Not Found : The product doesn't exist.")
                 return;
             }
         res.status(200)
@@ -104,7 +102,7 @@ router.get('/:id', validateToken, validateTokenAdmin,(req,res)=>{
 router.put('/:id', validateToken, validateTokenAdmin,(req,res)=>{
     const id = req.params.id; 
     const body = req.body;
-    const userKeys = ["username", "password", "fullname", "email", "address", "phone"];
+    const userKeys = ["name", "price", "description", "image"];
     const editKeys = [];
     const errors= {empty:[],wrong:[]};
 
@@ -139,7 +137,7 @@ router.put('/:id', validateToken, validateTokenAdmin,(req,res)=>{
 
       db.authenticate().then(async ()=>{
         let querySQL = `
-        UPDATE users
+        UPDATE products
         SET `;
         for(let element of editKeys){
             for (const key in element) {
@@ -153,11 +151,11 @@ router.put('/:id', validateToken, validateTokenAdmin,(req,res)=>{
         const [resultado] = await db.query(querySQL, {raw:true});
         if(resultado.changedRows == 0){
             res.status(404)
-            res.send("Not Found : The user doesn't exist.");
+            res.send("Not Found : The products doesn't exist.");
             return;
         } 
         console.log(resultado)
-        res.send({status: 'Modified', user: req.body})  
+        res.send({status: 'Modified',  product: req.body})  
 
     })  
 })
@@ -165,7 +163,7 @@ router.put('/:id', validateToken, validateTokenAdmin,(req,res)=>{
 router.delete('/:id', validateToken, validateTokenAdmin,(req,res)=>{
     db.authenticate().then(async ()=>{
         const id = req.params.id
-        const querySQL = ` DELETE FROM users WHERE id =${id}`;
+        const querySQL = ` DELETE FROM products WHERE id =${id}`;
         const [resultado] = await db.query(querySQL, {raw:true});
         console.log(resultado)
         if(resultado.affectedRows == 0){
@@ -173,7 +171,7 @@ router.delete('/:id', validateToken, validateTokenAdmin,(req,res)=>{
             res.send("Not Found : The user doesn't exist.")
             return;
         }
-        res.send({status: 'Deleted', user: id});
+        res.send({status: 'Deleted', product: id});
         return;
         });
 })
