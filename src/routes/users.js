@@ -22,8 +22,10 @@ router.get('/',validateToken, validateTokenAdmin,  (req, res)=>{
 router.post('/', (req,res)=>{
     
     const body = req.body;
-     const requiredKeys = ["username", "password", "fullname", "email", "address", "phone"];
-     const errors = [];
+    console.log(body)
+    const requiredKeys = ["username", "password", "fullname", "email", "address", "phone"];
+    const editKeys = [];
+    const errors= {empty:[],wrong:[], required: []};
      
      if(Object.keys(body).length == 0){
         res.status(400)
@@ -32,17 +34,36 @@ router.post('/', (req,res)=>{
 
     }
 
-     for (const key of requiredKeys) {
- 
-         if (!body.hasOwnProperty(key)) {
-             console.log(key)
-             errors.push(key)
-         }
-     } 
+    for (const key in body) {
+        if(requiredKeys.includes(key) && body[key]){
+            editKeys.push({[key] : body[key]})
+        }else if(body[key] == ''){
+            errors.empty.push(key)
+        }else{
+            errors.wrong.push(key)
+        }
+    }
 
-    if (errors.length > 0) {
+    for(const key of requiredKeys){
+        if(!body.hasOwnProperty(key)){
+            errors.required.push(key)
+
+        }
+    }
+
+    if (errors.wrong.length > 0 || errors.empty.length > 0 || errors.required.length > 0 ) {
+        let msg = '';
+        if(errors.empty.length>0){
+            msg = msg + `Bad Request - The fields are empty : ${errors.empty.join(', ')}\n`; 
+        }
+        else if(errors.wrong.length>0){
+            msg = msg + `Bad Request - The fields are wrong : ${errors.wrong.join(', ')}`;
+        }
+        else if( errors.required.length >0){
+            msg = msg+ `Bad Request - The following fields are required : ${errors.required.join(', ')}`;
+        }
         res.status(400)
-        res.send(`Bad Request - The following fields are required or are wrong: ${errors.join(', ')}` )
+        res.send(msg)
         return;
     }
 
