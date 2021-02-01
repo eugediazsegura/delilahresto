@@ -58,7 +58,7 @@ router.post('/',validateToken, validateUserID, async (req, res) =>{
    }
    /*validar que en el body el cliente haya enviado un array de objetos con el campo id*/
 
-   if (body.products && body.products.length > 0) {
+   if (body.products && body.products.length > 0 && !validateErrors(errors)) {
        const products = body.products
        let validatedIDs = []
        for (const key in products) {
@@ -106,13 +106,13 @@ router.post('/',validateToken, validateUserID, async (req, res) =>{
        } else {
            errors.wrong.push("products")
        }
+       await IDexistinDB(body.id_user, "users", errors);
+       await IDexistinDB(body.id_payment_method, "payment_methods", errors)
 }
 
-   await IDexistinDB(body.id_user, "users", errors);
-   await IDexistinDB(body.id_payment_method, "payment_methods", errors)
 
 
-   if (errors.wrong.length > 0 || errors.empty.length > 0 || errors.required.length > 0 || validatedProducts.length < 1 || errors.notExist.length > 0) {
+   if (validateErrors(errors) || validatedProducts.length < 1 || typeof(validatedProducts) != "object") {
        let msg = '';
        if(errors.empty.length>0){
            msg = msg + `Bad Request - The fields are empty : ${errors.empty.join(', ')}\n`; 
@@ -126,7 +126,7 @@ router.post('/',validateToken, validateUserID, async (req, res) =>{
        if(errors.notExist.length >0) {
         msg = msg+ `Bad Request - The id of ${errors.notExist} doesn't exist\n`;
        }
-        if(validatedProducts.length < 1){
+        if(validatedProducts.length >0 || typeof(validatedProducts) != "Object"){
             msg = msg+"Not Found : The product doesn't exist or the syntax is not correct. ";
        }
        res.status(400)
@@ -258,5 +258,9 @@ async function IDexistinDB(id, table, errors){
         }
         return resultado;
     })        
+}
+
+function validateErrors(errors){
+    return errors.wrong.length > 0 || errors.empty.length > 0 || errors.required.length > 0 || errors.notExist.length > 0
 }
 module.exports = router;
