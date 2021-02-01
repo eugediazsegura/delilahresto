@@ -1,5 +1,8 @@
+const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const secreto = 'supEr5ecret4JWT';
+
+
 
 function checkToken(req,res){
     try {
@@ -14,8 +17,10 @@ function checkToken(req,res){
 
 function validateToken(req, res, next){
    const verificarToken = checkToken(req, res)
+   console.log(verificarToken.id)
     if (verificarToken) {
         req.usuario = verificarToken;
+        console.log(req.usuario)
         next();            
     } else{
         return res.status(401).send({Error: "Token is invalid"});
@@ -33,5 +38,21 @@ function validateToken(req, res, next){
   
 } 
 
+function validateUserID(req,res,next) {
+    bodyParser.json()
+    const verificarToken = checkToken(req, res)
+    console.log(verificarToken)
+    const body = req.body;
+    console.log(body)
+    if(verificarToken.id == body.id_user){
+        next();     
+    }else{
+        res.status(403)
+        res.json({ Forbidden: "You don't have permissions for this request"})
+    }
+  
+} 
+
 module.exports.validateToken= validateToken;
 module.exports.validateTokenAdmin = validateTokenAdmin;
+module.exports.validateUserID= validateUserID;
