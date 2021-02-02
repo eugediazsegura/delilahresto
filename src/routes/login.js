@@ -12,15 +12,12 @@ async function validarUsuarioContrasena (username, password) {
     const [resultadoUsuarios] = await db.query(validateQuery, {raw:true});
     if(resultadoUsuarios.length > 0){ 
         return resultadoUsuarios
-    }else{
-        res.json({error: 'No existe el usuario o contraseña'})
     }   
 } 
 
 router.post('/', async (req,res)=>{ 
     let {username, password} = req.body;
     const validado = await validarUsuarioContrasena(username, password);
-    console.log({"vali": validado[0].username})
     if(!validado){
         res.json({error: 'No existe el usuario o contraseña'});
         return;

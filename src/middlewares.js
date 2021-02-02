@@ -17,7 +17,6 @@ function checkToken(req,res){
 
 function validateToken(req, res, next){
    const verificarToken = checkToken(req, res)
-   console.log(verificarToken.id)
     if (verificarToken) {
         req.usuario = verificarToken;
         console.log(req.usuario)
@@ -26,8 +25,33 @@ function validateToken(req, res, next){
         return res.status(401).send({Error: "Token is invalid"});
     }
 }
+    function validateUserID(req,res,next) {
+        bodyParser.json()
+        const verificarToken = checkToken(req, res)
+        console.log(verificarToken)
+        const body = req.body;
+        if(req.usuario.admin == 1){
+            return next();
+        }
+        if(req.params.id){
+            const id = req.params.id;
+            if (verificarToken.id ==req.params.id) {
+                return next()
+            }else{
+                res.status(403)
+                res.json({ Forbidden: "You don't have permissions for this request"})
+            }
+        }else if(verificarToken.id == body.id_user){
+            return next();     
+        }else{
+            res.status(403)
+            res.json({ Forbidden: "You don't have permissions for this request"})
+        }
+    
+    } 
 
  function validateTokenAdmin(req,res,next) {
+     
     const verificarToken = checkToken(req, res)
     if(verificarToken.admin == 1){
         next();     
@@ -38,21 +62,7 @@ function validateToken(req, res, next){
   
 } 
 
-function validateUserID(req,res,next) {
-    bodyParser.json()
-    const verificarToken = checkToken(req, res)
-    console.log(verificarToken)
-    const body = req.body;
-    console.log(body)
-    if(verificarToken.id == body.id_user){
-        next();     
-    }else{
-        res.status(403)
-        res.json({ Forbidden: "You don't have permissions for this request"})
-    }
-  
-} 
 
 module.exports.validateToken= validateToken;
-module.exports.validateTokenAdmin = validateTokenAdmin;
 module.exports.validateUserID= validateUserID;
+module.exports.validateTokenAdmin = validateTokenAdmin;

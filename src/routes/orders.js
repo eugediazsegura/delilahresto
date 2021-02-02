@@ -5,12 +5,12 @@ const db = require('../sql/conectionDB');
 const execQueryArray = require('../sql/conectionDB').execQueryArray;
 const moment = require('moment')
 const {validateToken , validateTokenAdmin, validateUserID} = require('../middlewares');
-let total = 0.0;
+
 router.use(bodyParser.json());
 
 router.get('/', validateTokenAdmin, validateTokenAdmin, (req,res) =>{
     db.authenticate().then(async ()=>{
-        const querySQL = ` SELECT o.id, u.fullname, os.label, pm.name,p.name,op.quantity, p.price * op.quantity, o.total, o.created_at
+        const querySQL = ` SELECT o.id, u.fullname, os.label, pm.name,p.name,op.quantity, p.price, o.total, o.created_at
         FROM order_products op
         INNER JOIN orders o on o.id = op.id_order
         INNER JOIN users u on u.id = o.id_user
@@ -33,6 +33,7 @@ router.post('/',validateToken, validateUserID, async (req, res) =>{
     const requiredKeys = ["id_user", "id_payment_method", "products"];
     const editKeys = [];
     const errors= {empty:[],wrong:[], required: [], notExist: []};
+    let total = 0.0;
     let validatedProducts = []
     if(Object.keys(body).length == 0){
        res.status(400)
@@ -78,9 +79,7 @@ router.post('/',validateToken, validateUserID, async (req, res) =>{
                if (resultado.length < 1) {
                    return;
                }
-               resultado.map(e => {
-                   total += parseFloat(e.price)
-               })
+             
                // Simplifica los resultados para solo obtener el id;
                validatedProductsID = resultado.map(e => e.id); 
                // valido que los id que envio el cliente, existan en db, comparando con el resultado simplificado
@@ -100,7 +99,14 @@ router.post('/',validateToken, validateUserID, async (req, res) =>{
                    return acc;
                }, {})
                validatedProducts = repeated;
-               console.log(repeated)
+               resultado.map(e => { 
+                   e.quantity = validatedProducts[e.id]
+               })
+               resultado.map(e => {
+                total += parseFloat(e.price)*e.quantity
+            })
+               
+            console.log(total)
                console.log(validatedProducts)
            })
        } else {
@@ -248,7 +254,22 @@ router.put('/status/:id',validateToken,validateTokenAdmin,async (req, res) =>{
     
 })
 /*esta función comprueba si los ids existen en las tablas*/
-
+router.delete('/:id', validateToken, validateTokenAdmin,(req,res)=>{
+    const id = req.params.id
+    db.authenticate().then(async ()=>{
+        const querySQL = [] 
+        querySQL.push(` DELETE FROM order_products WHERE id_order =${id}`);
+        querySQL.push(` DELETE FROM orders WHERE id =${id}`);
+        let results =await execQueryArray(querySQL);
+        if(results.length < 1){
+            res.status(404)
+            res.send("Not Found : The order doesn't exist.")
+            return;
+        }
+        res.send({status: 'Deleted', product: id});
+        return;
+        });
+})
 async function IDexistinDB(id, table, errors){
     await db.authenticate().then(async () => {
         const querySQL = ` SELECT * FROM ${table} WHERE id =${id}`;
