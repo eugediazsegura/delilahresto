@@ -21,7 +21,7 @@ router.get('/', validateTokenAdmin, validateTokenAdmin, (req,res) =>{
         const [resultados] = await db.query(querySQL, {raw:true});
         console.log(resultados)
             if(resultados.length == 0){
-                res.status(202).send("No Content: There are no users");
+                res.status(202).send("No Content: There are no orders");
                 return;
             }
         res.send(resultados); 
@@ -261,7 +261,10 @@ router.delete('/:id', validateToken, validateTokenAdmin,(req,res)=>{
         querySQL.push(` DELETE FROM order_products WHERE id_order =${id}`);
         querySQL.push(` DELETE FROM orders WHERE id =${id}`);
         let results =await execQueryArray(querySQL);
-        if(results.length < 1){
+        const affectedRows = results.reduce((acc, e)=>{ 
+            return acc + e.affectedRows
+        },0)
+        if(affectedRows == 0){
             res.status(404)
             res.send("Not Found : The order doesn't exist.")
             return;
