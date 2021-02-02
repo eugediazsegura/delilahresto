@@ -19,7 +19,6 @@ function validateToken(req, res, next){
    const verificarToken = checkToken(req, res)
     if (verificarToken) {
         req.usuario = verificarToken;
-        console.log(req.usuario)
         next();            
     } else{
         return res.status(401).send({Error: "Token is invalid"});
@@ -28,7 +27,6 @@ function validateToken(req, res, next){
     function validateUserID(req,res,next) {
         bodyParser.json()
         const verificarToken = checkToken(req, res)
-        console.log(verificarToken)
         const body = req.body;
         if(req.usuario.admin == 1){
             return next();

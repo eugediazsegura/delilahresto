@@ -97,7 +97,6 @@ async function execQueryArray(queries) {
         raw: true
       });
       results.push(result)
-      //console.log(results);
     })
   }
   return results;

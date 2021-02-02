@@ -8,7 +8,6 @@ router.use(bodyParser.json());
 
 async function validarUsuarioContrasena (username, password) {
     const validateQuery =  ` SELECT id, username, password,admin FROM users WHERE username = "${username}" AND password = "${password}"`;
-    console.log({validateq : validateQuery})
     const [resultadoUsuarios] = await db.query(validateQuery, {raw:true});
     if(resultadoUsuarios.length > 0){ 
         return resultadoUsuarios
