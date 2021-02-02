@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const router =  express.Router();
 const db = require('../sql/conectionDB');
-const {validateToken , validateTokenAdmin} = require('../middlewares');
+const {validateToken , validateUserID, validateTokenAdmin} = require('../middlewares');
 router.use(bodyParser.json());
 
 
@@ -83,7 +83,7 @@ router.post('/', validateToken, validateTokenAdmin, (req,res)=>{
     })
 });
 
-router.get('/:id', validateToken, validateTokenAdmin,(req,res)=>{
+router.get('/:id', (req,res)=>{
     db.authenticate().then(async ()=>{
         const id = req.params.id
         const querySQL = ` SELECT * FROM products WHERE id =${id}`;
@@ -168,7 +168,7 @@ router.delete('/:id', validateToken, validateTokenAdmin,(req,res)=>{
         console.log(resultado)
         if(resultado.affectedRows == 0){
             res.status(404)
-            res.send("Not Found : The user doesn't exist.")
+            res.send("Not Found : The product doesn't exist.")
             return;
         }
         res.send({status: 'Deleted', product: id});
