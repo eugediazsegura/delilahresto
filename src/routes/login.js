@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 router.use(bodyParser.json());
 
 async function validarUsuarioContrasena (username, password) {
-    const validateQuery =  ` SELECT username, password,admin FROM users WHERE username = "${username}" AND password = "${password}"`;
+    const validateQuery =  ` SELECT id, username, password,admin FROM users WHERE username = "${username}" AND password = "${password}"`;
     console.log({validateq : validateQuery})
     const [resultadoUsuarios] = await db.query(validateQuery, {raw:true});
     if(resultadoUsuarios.length > 0){ 
@@ -26,10 +26,10 @@ router.post('/', async (req,res)=>{
         return;
     }
     const admin= validado[0].admin;
-
+    const id= validado[0].id;
 
     const token = jwt.sign({
-        username, password, admin,
+        id, username, password, admin,
     }, 'supEr5ecret4JWT');
 
 

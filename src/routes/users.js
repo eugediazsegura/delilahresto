@@ -22,7 +22,6 @@ router.get('/',validateToken, validateTokenAdmin,  (req, res)=>{
 router.post('/', (req,res)=>{
     
     const body = req.body;
-    console.log(body)
     const requiredKeys = ["username", "password", "fullname", "email", "address", "phone"];
     const editKeys = [];
     const errors= {empty:[],wrong:[], required: []};
