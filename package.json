@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "mon": "nodemon server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "createDB": "node -e require('./src/sql/conectionDB').createTables();",
+    "createAdmin": "node ./src/admin.js"
   },
   "repository": {
     "type": "git",
