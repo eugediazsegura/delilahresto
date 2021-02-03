@@ -41,7 +41,7 @@ Si ya contás con un servidor mysql, o una conexión a la que quieras conectar e
 ## **PASO 2 - Iniciar el proyecto**
 
 #### (Opcional) Levantar docker
-Si utilizaste la opción de docker en el paso anterior, seguí estos pasos. De lo contrario, .
+Si utilizaste la opción de docker en el paso anterior, seguí estos pasos. De lo contrario, continuá con NPM Y Node .
 
  ```bash
  docker-compose up -d # Inicializa el docker, en el puerto 3306
@@ -52,7 +52,7 @@ Si necesitás acceder a la consola del docker
  docker exec -it delilahresto_db_1 bash
 ```
 
-### Npm y node
+### **Npm y Node**
 
 Para inicializar el proyecto, es necesario instalar las dependencias. 
 
@@ -66,7 +66,7 @@ npm run createDB
 ```
 Existen algunos endpoints con acceso a nivel administrador. Tendrás que 
 contar con al menos un usuario administrador para poder acceder a ellos. 
-*Corré este comando y cambia las variables $username$ y $password$ por tu acceso para el admin*
+*Corré este comando y cambia las variables $username$ y $password$ para crear tu usuario admin*
 
 ```bash 
 npm run createAdmin username password 
@@ -83,9 +83,11 @@ Para poder utilizar la aplicación, es necesario un token Bearer.
 Éste se consigue iniciando sesión con tu usuario. 
 Algunos endpoints utilizan acceso de administrador (para generar este usuario, lo deberás hacer por consola corriendo el comando listado anteriormente)
 
-Utiliza el endpoint POST /users para crear tu usuario no admin
+1. Utiliza el endpoint login para iniciar sesión con tu username y password admin para obtener tu token y luego, poder utilizarlo en algunos endpoints en los cuales es requerido.
 
-Utiliza el endpoint POST /login para obtener tu token
+2. Utiliza el endpoint POST /users para crear tu usuario no admin
+
+3. Utiliza nuevamente el endpoint POST /login para obtener tu token
 
 Utiliza tu token en el header Authentication: Bearer {tu_token} en los endpoints que lo requieran.
 
@@ -94,4 +96,7 @@ Utiliza tu token en el header Authentication: Bearer {tu_token} en los endpoints
 La documentación de los endpoints y sus accesos se encuentra aquí:
 https://app.swaggerhub.com/apis/eugediazsegura/DelilahResto-API/1.0.1
 
+*Diagrama de la base de Datos*
+
+- <img style="width: 900px;padding:0px 3px 0 0" width="900px" src="https://www.mediafire.com/convkey/eb4b/nw5ac53ssoybaxmzg.jpg"/>
 
