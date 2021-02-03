@@ -4,7 +4,6 @@ const router = express.Router();
 const db = require('../sql/conectionDB');
 const {
     validateToken,
-    validateUserID,
     validateTokenAdmin
 } = require('../middlewares');
 router.use(bodyParser.json());

@@ -29,21 +29,22 @@ function validateToken(req, res, next){
         const verificarToken = checkToken(req, res)
         const body = req.body;
         if(req.usuario.admin == 1){
-            return next();
+            return next(); // el usuario admin, tiene autorizacion sobre todo, se salta la logica de comprobacion de id. 
         }
         if(req.params.id){
-            const id = req.params.id;
             if (verificarToken.id ==req.params.id) {
                 return next()
             }else{
                 res.status(403)
                 res.json({ Forbidden: "You don't have permissions for this request"})
+                return;
             }
         }else if(verificarToken.id == body.id_user){
             return next();     
         }else{
             res.status(403)
             res.json({ Forbidden: "You don't have permissions for this request"})
+            return;
         }
     
     } 

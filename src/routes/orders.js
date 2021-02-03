@@ -12,16 +12,18 @@ const {
 
 router.use(bodyParser.json());
 
-router.get('/', validateTokenAdmin, validateTokenAdmin, (req, res) => {
+router.get('/', validateToken, (req, res) => {
     db.authenticate().then(async () => {
-        const querySQL = ` SELECT o.id, u.fullname, os.label, pm.name,p.name,op.quantity, p.price, o.total, o.created_at
+        let querySQL = ` SELECT o.id, u.fullname, os.label AS status, pm.type AS payment_method, p.name AS product, op.quantity, p.price, o.total, o.created_at
         FROM order_products op
         INNER JOIN orders o on o.id = op.id_order
         INNER JOIN users u on u.id = o.id_user
         INNER JOIN order_status os on os.id = o.id_order_status
         INNER JOIN payment_methods pm on pm.id = o.id_payment_method
-        INNER JOIN products p on p.id = op.id_product 
-        `;
+        INNER JOIN products p on p.id = op.id_product`;
+        if(req.usuario.admin == 0){
+            querySQL += ` WHERE o.id_user = ${req.usuario.id}`; 
+        }
         const [resultados] = await db.query(querySQL, {
             raw: true
         });
@@ -187,20 +189,23 @@ router.post('/', validateToken, validateUserID, async (req, res) => {
     }
 })
 
-router.get('/:id', validateToken, validateTokenAdmin, (req, res) => {
+router.get('/:id', validateToken, (req, res) => {
     db.authenticate().then(async () => {
         const id = req.params.id
-        const querySQL = `SELECT o.id, u.fullname, os.label, pm.name,p.name,op.quantity, p.price * op.quantity, o.total, o.created_at
+        let querySQL = `SELECT o.id, u.fullname, os.label AS status, pm.name AS status, op.type AS payment_method, p.name AS product, op.quantity, p.price * op.quantity, o.total, o.created_at
         FROM order_products op
         INNER JOIN orders o on o.id = op.id_order
         INNER JOIN users u on u.id = o.id_user
         INNER JOIN order_status os on os.id = o.id_order_status
         INNER JOIN payment_methods pm on pm.id = o.id_payment_method
         INNER JOIN products p on p.id = op.id_product WHERE op.id_order =${id}`;
+        if(req.usuario.admin == 0){
+            querySQL += ` AND o.id_user = ${req.usuario.id}`; 
+        }
         const [resultado] = await db.query(querySQL, {
             raw: true
         });
-        if (resultado.length < 1) {
+        if (resultado.length == 0) {
             res.status(404)
             res.send("Not Found : The order doesn't exist.")
             return;

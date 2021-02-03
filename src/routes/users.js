@@ -12,7 +12,7 @@ router.use(bodyParser.json());
 
 router.get('/', validateToken, validateTokenAdmin, (req, res) => {
     db.authenticate().then(async () => {
-        const querySQL = ` SELECT * FROM users`;
+        const querySQL = ` SELECT id, username, fullname, email, address, phone FROM users`;
         const [resultados] = await db.query(querySQL, {
             raw: true
         });
@@ -101,7 +101,7 @@ router.post('/', (req, res) => {
 router.get('/:id', validateToken, validateUserID, (req, res) => {
     db.authenticate().then(async () => {
         const id = req.params.id
-        const querySQL = ` SELECT * FROM users WHERE id =${id}`;
+        const querySQL = ` SELECT id, username, fullname, email, address, phone FROM users WHERE id =${id}`;
         const [resultado] = await db.query(querySQL, {
             raw: true
         });

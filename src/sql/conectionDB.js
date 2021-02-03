@@ -55,7 +55,7 @@ async function createTables() {
         total DECIMAL (10,2) NOT NULL,
         created_at DATETIME NOT NULL,
         CONSTRAINT orders_PK PRIMARY KEY (id),
-        CONSTRAINT orders_FK_1 FOREIGN KEY (id_user) REFERENCES users(id),
+        CONSTRAINT orders_FK_1 FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
         CONSTRAINT orders_FK_2 FOREIGN KEY (id_order_status) REFERENCES order_status(id),
         CONSTRAINT orders_FK_3 FOREIGN KEY (id_payment_method) REFERENCES payment_methods(id)
       )
