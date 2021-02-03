@@ -20,13 +20,13 @@ Incluí un **docker-compose.yml** para que sea mucho mas facil levantar el servi
 
 ### Opción B - Utilizar una conexión de mysql existente
 
-Si ya contás con un servidor mysql, o una conexión a la que quieras conectar el proyecto seguí estos pasos:
+Si ya contás con un servidor mysql como WAMP o XAMP, o una conexión a la que quieras conectar el proyecto seguí estos pasos:
 
-- Crear una base de datos en tu conexión (delilah_resto es el nombre por defecto)
+- Crear una base de datos en tu conexión (delilah_resto es el nombre por defecto). Podes utilizar un gestor de base de datos como DBEAVER O PHPMYADMIN para ejecutar el script.
   ```SQL
       CREATE DATABASE delilah_resto
   ```
-- Editar el archivo /src/sql/conectionDB.js. y /src/admin.js.  Hay que editar la variable global.db para insertar los datos de tu conexión.
+- Editar el archivo /src/sql/conectionDB.js. y /src/admin.js de este proyecto. Hay que editar la variable global.db para insertar los datos de tu conexión.
 
   ```javascript
     const config  = {
@@ -36,7 +36,7 @@ Si ya contás con un servidor mysql, o una conexión a la que quieras conectar e
       DB_DATABASE:'delilah_resto'
     }
   ```
-
+Para crear las tablas existe un comando (paso 2) pero podes importar el archivo sql adjunto y saltar ese paso.
 
 ## **PASO 2 - Iniciar el proyecto**
 
@@ -59,7 +59,7 @@ Para inicializar el proyecto, es necesario instalar las dependencias.
 ```bash
 npm install
 ```
-Lo siguiente será crear las tablas necesarias con sus relaciones y algunos datos para que funcione correctamente.
+Lo siguiente será crear las tablas necesarias con sus relaciones y algunos datos para que funcione correctamente. Si importaste las tablas con el archivo sql saltá  este paso.
 
 ```bash
 npm run createDB 
