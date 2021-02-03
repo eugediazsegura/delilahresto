@@ -190,9 +190,13 @@ router.delete('/:id', validateToken, validateTokenAdmin, (req, res) => {
     db.authenticate().then(async () => {
         const id = req.params.id
         const querySQL = ` DELETE FROM products WHERE id =${id}`;
-        const [resultado] = await db.query(querySQL, {
-            raw: true
-        });
+        let resultado;
+        try{
+            [resultado] = await db.query(querySQL, {raw: true});
+        }catch(e){
+            res.status(403).send("Forbidden: The product can't be removed. (Maybe exist in order?).");
+            return;
+        }
         if (resultado.affectedRows == 0) {
             res.status(404)
             res.send("Not Found : The product doesn't exist.")
