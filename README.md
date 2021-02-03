@@ -26,15 +26,15 @@ Si ya contás con un servidor mysql, o una conexión a la que quieras conectar e
   ```SQL
       CREATE DATABASE delilah_resto
   ```
-- Editar el archivo ./server.js. Hay que editar la variable global.db para insertar los datos de tu conexión.
+- Editar el archivo /src/sql/conectionDB.js. y /src/admin.js.  Hay que editar la variable global.db para insertar los datos de tu conexión.
 
   ```javascript
-    global.db = {
+    const config  = {
       DB_HOST:'localhost',
-      DB_USER:'usuario',
-      DB_PASS:'micontraseñasegura',
+      DB_USER:'user',
+      DB_PASS:'pass',
       DB_DATABASE:'delilah_resto'
-  }
+    }
   ```
 
 

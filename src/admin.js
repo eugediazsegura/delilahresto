@@ -1,5 +1,12 @@
 const db = require('sequelize');
-const sequelize = new db(`mysql://${global.db.DB_USER}:${global.db.DB_PASS}@${global.db.DB_HOST}:3306/${global.db.DB_DATABASE}`);
+const config = {
+    DB_HOST:'127.0.0.1',
+    DB_USER:'root',
+    DB_PASS:'1234',
+    DB_DATABASE:'delilah_resto'
+}
+
+const sequelize = new db(`mysql://${config.DB_USER}:${config.DB_PASS}@${config.DB_HOST}:3306/${config.DB_DATABASE}`);
 
 function createAdmin(){
     if(process.argv.length > 3){
