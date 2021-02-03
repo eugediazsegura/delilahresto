@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 
-const sequelize = new Sequelize('mysql://root:1234@localhost:3306/delilah_resto');
+const sequelize = new Sequelize(`mysql://${global.db.DB_USER}:${global.db.DB_PASS}@${global.db.DB_HOST}:3306/${global.db.DB_DATABASE}`);
 const statusOrder = ["nuevo", "confirmado", "preparando", "enviando", "cancelado", "entregado"];
 const statusOrderColor = ["#ef4a5a", "#fd6c3a", "#ffc641", "#30d694", "#afbef7", "#7d94a3"];
 const methodOrders = ["Efectivo", "Visa", "Mastercard", "Naranja", "Santander", "Patagonia"]
@@ -97,6 +97,7 @@ async function execQueryArray(queries) {
         raw: true
       });
       results.push(result)
+      //console.log(results);
     })
   }
   return results;
